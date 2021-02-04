@@ -19,4 +19,4 @@ class Zero:
 num_1 = Zero(input('Введите цифру 0: '))
 num_2 = Zero(input('Введите цифру 1: '))
 
-print(num_1 / num_2)
+print('Результат деления: ', num_1 / num_2)
