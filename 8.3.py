@@ -27,7 +27,7 @@ class NotNumber(ValueError):
                 if not value.isdigit():
                     raise NotNumber(value)
                 self.list.append(int(value))
-            except (NotNumber, TypeError) as ex:
+            except (NotNumber, TypeError):
                 print('Не число!')
         return self
 
