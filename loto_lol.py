@@ -94,7 +94,7 @@ for i in range(91):
     print(ai_player)
     print('Номер выпавщего боченка: ', ga[0])
     # Ход игрока
-    if ga[0] in pl1:                             # косяк не входит в условие
+    if set(ga).issubset(pl1):                             # косяк не входит в условие
         if input('Зачеркнуть цифру? (y/n) ') == 'y':
             if ga[0] not in pl1:
                 print('You lose')
@@ -108,8 +108,9 @@ for i in range(91):
         print('You win')
         break
     # Ход компьютера
-    if ga[0] in ai:                            # косяк не входит в условие
-        ai[ai.index(ga[0])] = '-'
+    if set(ga).issubset(ai):                                # косяк не входит в условие
+        if ga[0] in ai:
+            ai[ai.index(ga[0])] = '-'
     else:
         print('You lose, PC win')
         break
