@@ -99,7 +99,7 @@ for i in range(91):
             if ga[0] not in pl1:
                 print('You lose')
                 break
-            pl1[pl1.index(ga)] = '-'
+            pl1[pl1.index(ga[0])] = '-'
         if input('Зачеркнуть цифру? (y/n) ') == 'n':
             if ga[0] in pl1:
                 print('You lose')
@@ -109,7 +109,7 @@ for i in range(91):
         break
     # Ход компьютера
     if ga[0] in ai:                            # косяк не входит в условие
-        ai[ai.index(ga)] = '-'
+        ai[ai.index(ga[0])] = '-'
     else:
         print('You lose, PC win')
         break
