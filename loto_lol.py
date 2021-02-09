@@ -58,7 +58,7 @@ ai = ai_player.gen_card()
 game = LotoGame()
 ga = game.gen_bag()
 #print(ga)
-
+"""
 for i in pl1:                                     # проходимся в цикле по значению боченка по списку карточки игрока
     print(player_1)                               # вывод карточек и номера боченка
     print(ai_player)
@@ -73,7 +73,7 @@ for i in pl1:                                     # проходимся в ци
                             ai[ii] = ' - '            # заменяем значение ячейки на прочерк в карточке компьютера
                     else:
                         print('Выиграл компьютер')
-                continue                              # продолжаем играть
+                #continue                              # продолжаем играть
             else:
                 print('Вы проиграли')                 # если нет значение "Вы проиграли"
                 break
@@ -86,8 +86,32 @@ for i in pl1:                                     # проходимся в ци
                 break
     else:
         print('Вы выиграли')
+"""
 
 
+for i in range(91):
+    print(player_1)
+    print(ai_player)
+    print('Номер выпавщего боченка: ', ga)
+    # Ход игрока
+    if isinstance(pl1, int):
+        if input('Зачеркнуть цифру? (y/n) ') == 'y':
+            if pl1.index(ga) != ga:
+                print('You lose')
+                break
+            pl1[pl1.index(ga)] = '-'
+        if input('Зачеркнуть цифру? (y/n) ') == 'n':
+            if i == ga:
+                print('You lose')
+                break
+    else:
+        print('You win')
+        break
+    # Ход компьютера
+    if isinstance(ai, int):
+        if ai.index(ga) == ga:
+            ai[ai.index(ga)] = '-'
+    else:
+        print('You lose, PC win')
+        break
 
-        # метод выигрывания
-# если в карточке игрока стоит 15 прочерков то 'Вы выиграли'
