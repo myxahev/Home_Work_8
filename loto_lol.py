@@ -47,7 +47,7 @@ class LotoGame:
         self.one_barrel = self.bag[0]
         return self.one_barrel
 
-player_1 = LotoCard('Евгений')
+player_1 = LotoCard('Игрок')
 pl1 = player_1.gen_card()
 #print(player_1)
 
@@ -94,24 +94,25 @@ for i in range(91):
     print(ai_player)
     print('Номер выпавщего боченка: ', ga)
     # Ход игрока
-    if isinstance(pl1, int):
+    if isinstance(pl1, int):                             # косяк не входит в условие
         if input('Зачеркнуть цифру? (y/n) ') == 'y':
-            if pl1.index(ga) != ga[0]:                #косяк: нужна проверка значения ga на значение из списка pl1
+            if ga[0] not in pl1:
                 print('You lose')
                 break
             pl1[pl1.index(ga)] = '-'
         if input('Зачеркнуть цифру? (y/n) ') == 'n':
-            if i == ga:
+            if ga[0] in pl1:
                 print('You lose')
                 break
     else:
         print('You win')
         break
     # Ход компьютера
-    if isinstance(ai, int):
-        if ai.index(ga) == ga[0]:                    #косяк: нужна проверка значения ga на значение из списка ai
+    if isinstance(ai, int):                            # косяк не входит в условие
+        if ga[0] in ai:
             ai[ai.index(ga)] = '-'
     else:
         print('You lose, PC win')
         break
     ga.pop(0)
+
