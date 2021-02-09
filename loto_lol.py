@@ -43,7 +43,7 @@ class LotoGame:
     def gen_bag(self):
         self.bag = [i for i in range(1, 91)]
         random.shuffle(self.bag)
-        print(self.bag)
+        #print(self.bag)
         self.one_barrel = self.bag[0]
         return self.one_barrel
 
@@ -96,7 +96,7 @@ for i in range(91):
     # Ход игрока
     if isinstance(pl1, int):
         if input('Зачеркнуть цифру? (y/n) ') == 'y':
-            if pl1.index(ga) != ga:
+            if pl1.index(ga) != ga[0]:                #косяк: нужна проверка значения ga на значение из списка pl1
                 print('You lose')
                 break
             pl1[pl1.index(ga)] = '-'
@@ -109,9 +109,9 @@ for i in range(91):
         break
     # Ход компьютера
     if isinstance(ai, int):
-        if ai.index(ga) == ga:
+        if ai.index(ga) == ga[0]:                    #косяк: нужна проверка значения ga на значение из списка ai
             ai[ai.index(ga)] = '-'
     else:
         print('You lose, PC win')
         break
-
+    ga.pop(0)
