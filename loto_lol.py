@@ -44,8 +44,8 @@ class LotoGame:
         self.bag = [i for i in range(1, 91)]
         random.shuffle(self.bag)
         #print(self.bag)
-        self.one_barrel = self.bag[0]
-        return self.one_barrel
+        #self.one_barrel = self.bag[0]
+        return self.bag
 
 player_1 = LotoCard('Игрок')
 pl1 = player_1.gen_card()
@@ -92,7 +92,7 @@ for i in pl1:                                     # проходимся в ци
 for i in range(91):
     print(player_1)
     print(ai_player)
-    print('Номер выпавщего боченка: ', ga)
+    print('Номер выпавщего боченка: ', ga[0])
     # Ход игрока
     if isinstance(pl1, int):                             # косяк не входит в условие
         if input('Зачеркнуть цифру? (y/n) ') == 'y':
@@ -114,5 +114,8 @@ for i in range(91):
     else:
         print('You lose, PC win')
         break
-    ga.pop(0)
+
+ga.pop(0)
+
+
 
