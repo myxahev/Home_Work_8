@@ -1,121 +1,169 @@
+"""
+== Лото ==
+
+Правила игры в лото.
+
+Игра ведется с помощью спе циальных карточек, на которых отмечены числа,
+и фишек (бочонков) с цифрами.
+
+Количество бочонков — 90 штук (с цифрами от 1 до 90).
+
+Каждая карточка содержит 3 строки по 9 клеток. В каждой строке по 5 случайных цифр,
+расположенных по возрастанию. Все цифры в карточке уникальны. Пример карточки:
+
+--------------------------
+    9 43 62          74 90
+ 2    27    75 78    82
+   41 56 63     76      86
+--------------------------
+
+В игре 2 игрока: пользователь и компьютер. Каждому в начале выдается
+случайная карточка.
+
+Каждый ход выбирается один случайный бочонок и выводится на экран.
+Также выводятся карточка игрока и карточка компьютера.
+
+Пользователю предлагается зачеркнуть цифру на карточке или продолжить.
+Если игрок выбрал "зачеркнуть":
+	Если цифра есть на карточке - она зачеркивается и игра продолжается.
+	Если цифры на карточке нет - игрок проигрывает и игра завершается.
+Если игрок выбрал "продолжить":
+	Если цифра есть на карточке - игрок проигрывает и игра завершается.
+	Если цифры на карточке нет - игра продолжается.
+
+Побеждает тот, кто первый закроет все числа на своей карточке.
+
+Пример одного хода:
+
+Новый бочонок: 70 (осталось 76)
+------ Ваша карточка -----
+ 6  7          49    57 58
+   14 26     -    78    85
+23 33    38    48    71
+--------------------------
+-- Карточка компьютера ---
+ 7 87     - 14    11
+      16 49    55 88    77
+   15 20     -       76  -
+--------------------------
+Зачеркнуть цифру? (y/n)
+
+Подсказка: каждый следующий случайный бочонок из мешка удобно получать
+с помощью функции-генератора.
+
+Подсказка: для работы с псевдослучайными числами удобно использовать
+модуль random: http://docs.python.org/3/library/random.html
+
+"""
 import random
 
 
+class LotoGame:
+
+    def __init__(self, player, computer):
+        self._player = player
+        self._computer = computer
+        # Тут с помощью random.sample я получаю не повторяющиеся числа
+        self._NUMBERS_COUNT = 90
+        MAX_NUMBER = 90
+        # Вы можете использовать random.shuffle на сгенерированном списке, например генератором списков!
+        self._numbers_in_bag = random.sample(range(1, MAX_NUMBER + 1), self._NUMBERS_COUNT)
+
+    def _get_number(self):
+        return self._numbers_in_bag.pop()
+
+    def start(self):
+        for i in range(self._NUMBERS_COUNT):
+            print(self._player, self._computer)
+            number = self._get_number()
+            print('Новый бочонок {}, осталось {}'.format(number, len(self._numbers_in_bag)))
+            choice = input('Хотите зачеркуть? y/n:\n')
+            if choice == 'y':
+                # Тут мы зачеркиваем число если оно есть, если нет, а игрок попытался, то он проиграл.
+                if not self._player.try_stroke_number(number):
+                    print('Игрок проиграл!')
+                    break
+            elif self._player.has_number(number):
+                print('Игрок проиграл!')
+                break
+            # Компьютер не ошибается =)
+            # if random.random() < 0.02:
+            #     pass  # в 2% случаеав
+            if self._computer.has_number(number):
+                self._computer.try_stroke_number(number)
+
 
 class LotoCard:
-    """Генерация игровой карточки"""
 
-    def __init__(self, name_player):
-        self.name_player = name_player
+    def __init__(self, player_type):
+        self.player_type = player_type
+        self._card = [[],
+                      [],
+                      []]
+        self._MAX_NUMBER = 90
+        self._MAX_NUMBERS_IN_CARD = 15
+        self._numbers_stroked = 0
+        NEED_SPACES = 4
+        NEED_NUMBERS = 5
 
-    def gen_card(self):
-        self.card = [i for i in range(1, 91)]
-        random.shuffle(self.card)
-        self.card = self.card[:15]
-        return self.card
+        # Числа для будущей карты лото
+        # random.sample - позволяет получить набор случайных, но уникальных чисел!
+        self._numbers = random.sample(range(1, self._MAX_NUMBER + 1), self._MAX_NUMBERS_IN_CARD)
 
+        # цикл вставляющий пробелы и цифры в нашу карту
+        for line in self._card:
+            for _ in range(NEED_SPACES):
+                line.append(' ')
+            for _ in range(NEED_NUMBERS):
+                line.append(self._numbers.pop())
+
+        # Данная функция возвращает либо число, которое непосредственно на линии, либо случайное, чтобы случайно расставить пробелы.
+        def check_sort_item(item):
+            if isinstance(item, int):
+                return item
+            return random.randint(1, self._MAX_NUMBER)
+
+# [' ',' ',' ',' ', 80,2,1,3,5]
+# [' ', 80, 3,2,1, ' ']
+# [1, ' ', 2, 3, ' ', 80]
+#[3 25]
+
+        # Здесь мы именно сортируем списки внутри списка
+        for index, line in enumerate(self._card):
+            self._card[index] = sorted(line, key=check_sort_item)
+
+
+    def has_number(self, number):
+        for line in self._card:
+            if number in line:
+                return True
+        return False
+
+    def try_stroke_number(self, number):
+        for index, line in enumerate(self._card):
+            for num_index, number_in_card in enumerate(line):
+                if number == number_in_card:
+                    self._card[index][num_index] = '-'
+                    self._numbers_stroked += 1
+                    if self._numbers_stroked >= self._MAX_NUMBERS_IN_CARD:
+                        raise Exception('{} победил!'.format(self.player_type))
+                    return True
+        return False
+# ['23 ', '11 ', '3  ', ' 56']
+# [     1  3 56]
+    # Метод для строкового представления объекта
     def __str__(self):
-        line1 = sorted(self.card[:5])
-        line2 = sorted(self.card[5:10])
-        line3 = sorted(self.card[10:15])
+        MAX_FIELD_LENGTH = 3
+        header = '\n{}:\n--------------------------'.format(self.player_type)
+        body = '\n'
+        for line in self._card:
+            for field in line:
+                body += str(field).ljust(MAX_FIELD_LENGTH)  # Выравниваем, добавляя пробелы, если это необходимо.
+            body += '\n'
+        return header + body
 
-        num_i = [i for i in range(1, 5)]
-        j = 0
+human_player = LotoCard('Игрок')
+computer_player = LotoCard('Компьютер')
 
-        while len(line1) < 9 and len(line2) < 9 and len(line3) < 9:
-            random.shuffle(num_i)
-            line1.insert(num_i[0 + j], "  ")
-            random.shuffle(num_i)
-            line2.insert(num_i[0 + j], "  ")
-            random.shuffle(num_i)
-            line3.insert(num_i[0 + j], "  ")
-            j += 1
-        line1 = ' '.join(map(str, line1))
-        line2 = ' '.join(map(str, line2))
-        line3 = ' '.join(map(str, line3))
-
-        return f'{str(self.name_player).center(27, "-")}\n{line1}\n{line2}\n{line3}\n{"-" * 27}'
-
-
-class LotoGame:
-    """Механизм игры"""
-
-    def gen_bag(self):
-        self.bag = [i for i in range(1, 91)]
-        random.shuffle(self.bag)
-        #print(self.bag)
-        #self.one_barrel = self.bag[0]
-        return self.bag
-
-player_1 = LotoCard('Игрок')
-pl1 = player_1.gen_card()
-#print(player_1)
-
-ai_player = LotoCard('Компьютер')
-ai = ai_player.gen_card()
-#print(ai_player)
-
-game = LotoGame()
-ga = game.gen_bag()
-#print(ga)
-"""
-for i in pl1:                                     # проходимся в цикле по значению боченка по списку карточки игрока
-    print(player_1)                               # вывод карточек и номера боченка
-    print(ai_player)
-    print(ga)
-    if isinstance(pl1, int):
-        if input('Зачеркнуть цифру? (y/n) ') == 'y':  # если пользователь ответил вычеркнуть
-            if i == ga:                               # проверка соответстви боченка на значении в карточке игрока
-                pl1[i] = ' - '                        # заменяем значение ячейки на прочерк в карточке игрока
-                for ii in ai:                         # проходимся в цикле по значению боченка по списку карточки компьтера
-                    if isinstance(ai, int):
-                        if ii == ga:                  # проверка соответстви боченка на значении в карточке компьтера
-                            ai[ii] = ' - '            # заменяем значение ячейки на прочерк в карточке компьютера
-                    else:
-                        print('Выиграл компьютер')
-                #continue                              # продолжаем играть
-            else:
-                print('Вы проиграли')                 # если нет значение "Вы проиграли"
-                break
-
-        if input('Зачеркнуть цифру? (y/n) ') == 'n':  # если пользователь ответил нет
-            if i != ga:                               # проверка на не соответстви боченка на значении в карточке игрока
-                continue                              # продолжаем играть
-            else:
-                print('Вы проиграли')                 # если есть значение "Вы проиграли"
-                break
-    else:
-        print('Вы выиграли')
-"""
-
-
-for i in range(91):
-    print(player_1)
-    print(ai_player)
-    print('Номер выпавщего боченка: ', ga[0])
-    # Ход игрока
-    if set(pl1).issubset(ga):                             # косяк не входит в условие
-        if input('Зачеркнуть цифру? (y/n) ') == 'y':
-            if ga[0] not in pl1:
-                print('You lose')
-                break
-            pl1[pl1.index(ga[0])] = '-'
-        if input('Зачеркнуть цифру? (y/n) ') == 'n':
-            if ga[0] in pl1:
-                print('You lose')
-                break
-    else:
-        print('You win')
-        break
-    # Ход компьютера
-    if set(ai).issubset(ga):                                # косяк не входит в условие
-        if ga[0] in ai:
-            ai[ai.index(ga[0])] = '-'
-    else:
-        print('You lose, PC win')
-        break
-
-ga.pop(0)
-
-
-
+game = LotoGame(human_player, computer_player)
+game.start()
